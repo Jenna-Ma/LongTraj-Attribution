@@ -2,20 +2,10 @@
 
 面向长程智能体失败轨迹的关键步骤定位方法。输入一条最终失败的轨迹，输出最早导致最终失败的 critical step。
 
-本目录归档共享主 pipeline，并在统一入口中集成 LongRCA SWE-bench Pro
-的 episode 专用定位器。入口会根据轨迹结构自动路由：
-
 ```text
 失败轨迹
-  -> 是否包含精确名称 DiagnostAgent (-> ActionAgent)？
-       ├─ 是：LongRCA episode 选择 + 代码门控 + 结构规则融合
-       └─ 否：数据/控制流图 + 区域先验 + 压缩剪枝 + 多维定位
   -> critical step
 ```
-
-LongRCA 路由对应历史记录 **63/128 = 49.22%** 的方法。WebArena、VitaBench
-和 ALFWorld 的语料专用 `probe` 方法仍不在本快照中。快照来源和边界见
-[SNAPSHOT.md](SNAPSHOT.md)。
 
 ## 1. 安装
 
@@ -226,26 +216,7 @@ python -m longtraj.integration `
 
 `--dry-run` 的预测是本地 fallback，只能用于验证输入、输出和流水线接缝，不能作为定位结果或准确率。
 
-## 4. Profile 选择
-
-| profile | 用途 | 关键设置 |
-|---|---|---|
-| `generic` | 未知语料的保守起点 | 共享主 pipeline 默认配置 |
-| `rootse_qwen_best` | TrajAudit / RootSE | 区域先验、轻量原文恢复、宽 prompt |
-| `sp_qwen_highest` | TrajDebug / SWE-bench Pro 已记录最高读数 | 先验条件压缩、严格候选池、多维核验、120k prompt |
-| `sp_qwen_clean` | SP 的稳定复现版本 | 与上一项相同，但完整保留候选且使用 700k prompt |
-
-这些 profile 只是固化已记录的配置，不代表跨语料都最优。新项目建议先用 `generic` 小规模验证，再根据轨迹结构选择对应 profile。必要时可通过构造函数的 `config_overrides` 覆盖 `Config` 字段，并保留完整实验记录。
-
-LongRCA 专用方法不作为 profile 暴露，因为它由 handoff 结构自动触发。它执行：
-
-1. 提取所有 `DiagnostAgent (-> ActionAgent)` handoff；
-2. 用任务、handoff、episode 尾部诊断和最终测试/评审证据让 Qwen 选择失败 episode；
-3. 代码核验后续 handoff 的长度不得短于第一 handoff；
-4. 模型保留第一 episode 时，允许“长度至少 3 倍且任务词覆盖率提高至少 0.10”的确定性规则补位；
-5. 输出所选 episode 的 handoff step。
-
-## 5. 主方法与代码对应关系
+## 4. 主方法与代码对应关系
 
 - `longtraj/tracing.py`：构建数据流/控制流图。
 - `longtraj/spans.py`、`longtraj/units.py`、`longtraj/span_prior.py`：语义区域与区域先验。
@@ -254,12 +225,12 @@ LongRCA 专用方法不作为 profile 暴露，因为它由 handoff 结构自动
 - `longtraj/localize.py`：主定位器、多维候选核验与融合。
 - `longtraj/pipeline.py`：编排完整 pipeline。
 - `longtraj/integration.py`：本项目对外的稳定 SDK/JSON CLI 边界。
-- `longtraj/longrca_specialized.py`：LongRCA 49.22% episode 专用链路。
+- `longtraj/longrca_specialized.py`：LongRCA 49.22% episode 链路。
 - `longtraj/artifacts.py`：中间产物和 flow 的持久化。
 
 更多方法细节见 [METHOD.md](METHOD.md)、[METHOD_sp_noout.md](METHOD_sp_noout.md) 和 [BEST_ARM_Q7.md](BEST_ARM_Q7.md)。
 
-## 6. 复现实验
+## 5. 复现实验
 
 数据不重复放入源码快照。建议目录为：
 
@@ -292,7 +263,7 @@ workspace-root/
 
 参考结果位于 `reference_results/`，参考 flow 位于 `reference_flows/`。每次新运行会写入独立的 `results/<timestamp>/`，不会修改只读参考产物。
 
-## 7. 测试与真值隔离
+## 6. 测试与真值隔离
 
 ```powershell
 python tests/test_integration.py
