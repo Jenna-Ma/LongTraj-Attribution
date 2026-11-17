@@ -1,0 +1,295 @@
+{
+ "artifact_version": 2,
+ "task_id": "instance_django__django-14787",
+ "source": "trajaudit",
+ "subset": "auto-code-rover/gpt-4-0125",
+ "n_steps": 3,
+ "raw_chars": 5807,
+ "model": "qwen3.7-plus",
+ "config": {
+  "max_anchors": 3,
+  "flow_window": 20,
+  "flow_index_per_step": 180,
+  "flow_index_chars": 40000,
+  "origin_edges": false,
+  "backward": false,
+  "max_rounds": 20,
+  "batch_size": 4,
+  "max_traced_steps": 60,
+  "topup_rounds": 0,
+  "topup_calls": 12,
+  "target_spans": null,
+  "weak_ratio": 0.0,
+  "workers": 3,
+  "max_prompt_chars": 700000,
+  "verbatim_limit": 2500,
+  "build_outline": true,
+  "span_prior": true,
+  "prior_samples": 1,
+  "prior_signals": false,
+  "prior_symptom": false,
+  "prior_enhanced": false,
+  "prior_coverage_target": 0.3,
+  "localize_symptom": false,
+  "memo_scan": false,
+  "memo_chapters": 10,
+  "prior_unranked": false,
+  "prior_to_localizer": true,
+  "localize_thinking": false,
+  "localize_rootcause": false,
+  "localize_pointwise": false,
+  "localize_multiturn": false,
+  "op_analysts": false,
+  "mixed_paint": false,
+  "rule_anchors": false,
+  "unit_spans": false,
+  "prior_compress": false,
+  "prior_budget_chars": 90000,
+  "possible_keep": false,
+  "full_keep": false,
+  "span_judge": false,
+  "judge_to_localizer": false,
+  "judge_workers": 8,
+  "hybrid_anchors": false,
+  "candidate_set": false,
+  "candidate_strict": false,
+  "plan_candidates": false,
+  "plan_cap": 15,
+  "shortlist": false,
+  "shortlist_k": 5,
+  "protect_candidates": false,
+  "candidates_verbatim": false,
+  "cand_evidence": false,
+  "framings": 1,
+  "verify": false,
+  "verify_graded": false,
+  "verify_chain": false,
+  "verify_reflect": false,
+  "verify_duel": false,
+  "verify_pool": false,
+  "verify_pool_union": false,
+  "verify_outdeg": false,
+  "multi_expert": false,
+  "roll_call": false,
+  "expect_spec": false,
+  "samples": 1,
+  "zoom": false,
+  "zoom_window": 5,
+  "bracket": false,
+  "bracket_window": 5,
+  "bracket_max": 20,
+  "bracket_group": 4,
+  "audit": false,
+  "audit_max": 6,
+  "error_anchors": false,
+  "keep_diagnostics": true,
+  "save_spans": true,
+  "save_steps": true
+ },
+ "stage": "complete",
+ "created": "2026-08-30T14:33:35",
+ "updated": "2026-10-19T16:55:49",
+ "flow": {
+  "anchors": [
+   2
+  ],
+  "anchors_located": [
+   2
+  ],
+  "failure_summary": "The agent submitted a patch via write_patch, but the resulting fix did not preserve the wrapper's __name__ attribute on the partial object. The test test_wrapper_assignments then failed because func_name was None instead of 'method'.",
+  "failure_entities": [
+   "method_decorator",
+   "write_patch",
+   "test_wrapper_assignments",
+   "func_name",
+   "__name__",
+   "__module__",
+   "functools.partial",
+   "method"
+  ],
+  "edges": [
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "data",
+    "entity": "method_decorator source in django/utils/decorators.py",
+    "rationale": "step 1 identifies buggy method from the search result code"
+   },
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "data",
+    "entity": "Could not find method logger in the codebase",
+    "rationale": "step 1 reasons about missing logger context from the failed search"
+   },
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "control",
+    "entity": "logger search returned not found",
+    "rationale": "step 1 deliberates on whether more context is needed because logger was not located"
+   },
+   {
+    "src": 0,
+    "dst": 2,
+    "kind": "data",
+    "entity": "django/utils/decorators.py method_decorator code",
+    "rationale": "the patch targets the code surfaced by the search"
+   },
+   {
+    "src": 1,
+    "dst": 2,
+    "kind": "control",
+    "entity": "bug location: method_decorator in django/utils/decorators.py",
+    "rationale": "step 2 writes the patch to the location step 1 concluded on"
+   }
+  ]
+ },
+ "flow_stats": {
+  "n_edges": 5,
+  "n_data_edges": 3,
+  "n_control_edges": 2,
+  "n_anchors": 1,
+  "steps_on_flow": 3,
+  "steps_on_data_flow": 2,
+  "steps_on_control_flow": 3,
+  "coverage": 1.0,
+  "earliest_on_flow": 0
+ },
+ "spans": [
+  {
+   "start": 0,
+   "end": 0,
+   "label": "locating relevant code",
+   "tier": "weak",
+   "summary": "The agent searched the codebase to locate the method_decorator function, a logger method, and Test classes. It successfully found method_decorator in django/utils/decorators.py and identified 11 Test classes across multiple test files, but could not find any method named logger."
+  },
+  {
+   "start": 1,
+   "end": 1,
+   "label": "evaluating context and identifying buggy method",
+   "tier": "weak",
+   "summary": "The agent evaluated the context to understand the missing logger decorator and locate the bug. It identified method_decorator in django/utils/decorators.py as the buggy location due to its handling of objects missing function attributes like __name__, and successfully retrieved the method's source code."
+  },
+  {
+   "start": 2,
+   "end": 2,
+   "label": "applying fix",
+   "tier": "weak",
+   "summary": "The agent aimed to apply a fix to the codebase. It executed the write_patch function with empty arguments to submit the patch."
+  }
+ ],
+ "outline": {
+  "overview": "The agent set out to resolve an issue where the method_decorator function failed when passed a partial object lacking standard function attributes like __name__. To orient itself, it searched the codebase for the method_decorator function, a logger method, and Test classes. During steps 0-0, it successfully located method_decorator in django/utils/decorators.py and identified 11 Test classes across multiple test files, but it could not find a method named logger. When the agent could not find the logger method mentioned in the task description, it worked around this obstacle in steps 1-1 by shifting its focus to how method_decorator handles objects missing function attributes. It then retrieved the source code for method_decorator in django/utils/decorators.py to prepare for the modification. Finally, in steps 2-2, the agent executed the write_patch function with empty arguments to submit the patch, concluding the run.",
+  "spans": [
+   {
+    "start": 0,
+    "end": 0,
+    "label": "locating relevant code",
+    "tier": "weak",
+    "summary": "The agent searched the codebase to locate the method_decorator function, a logger method, and Test classes. It successfully found method_decorator in django/utils/decorators.py and identified 11 Test classes across multiple test files, but could not find any method named logger."
+   },
+   {
+    "start": 1,
+    "end": 1,
+    "label": "evaluating context and identifying buggy method",
+    "tier": "weak",
+    "summary": "The agent evaluated the context to understand the missing logger decorator and locate the bug. It identified method_decorator in django/utils/decorators.py as the buggy location due to its handling of objects missing function attributes like __name__, and successfully retrieved the method's source code."
+   },
+   {
+    "start": 2,
+    "end": 2,
+    "label": "applying fix",
+    "tier": "weak",
+    "summary": "The agent aimed to apply a fix to the codebase. It executed the write_patch function with empty arguments to submit the patch."
+   }
+  ]
+ },
+ "steps": [
+  {
+   "index": 0,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 2428,
+   "flows": "data+control",
+   "anchor": false,
+   "text": "Action: [{\"func_name\": \"search_method\", \"arguments\": {\"method_name\": \"method_decorator\"}, \"call_ok\": true}, {\"func_name\": \"search_method\", \"arguments\": {\"method_name\": \"logger\"}, \"call_ok\": false}, {\"func_name\": \"search_class\", \"arguments\": {\"class_name\": \"Test\"}, \"call_ok\": true}]\nObservation: Result of search_method(\"method_decorator\"):\nFound 1 methods with name method_decorator in the codebase.\nSearch result 1: <file>django/utils/decorators.py</file> <func>method_decorator</func> <code>def method_decorator(decorator, name=''):\n    \"\"\"\n    Convert a function decorator into a method decorator\n    \"\"\"\n    # 'obj' can be a class or a function. If 'obj' is a function at the time it\n    # is passed to _dec,  it will eventually be a method of the class it is\n    # defined on. If 'obj' is a class, the 'name' is required to be the name\n    # of the method that will be decorated.\n    def _dec(obj):\n        if not isinstance(obj, type):\n            return _multi_decorate(decorator, obj)\n        if not (name and hasattr(obj, name)):\n            raise ValueError(\n                \"The keyword argument `name` must be the name of a method \"\n                \"of the decorated class: %s. Got '%s' instead.\" % (obj, name)\n            )\n        method = getattr(obj, name)\n        if not callable(method):\n            raise TypeError(\n                \"Cannot decorate '%s' as it isn't a callable attribute of \"\n                \"%s (%s).\" % (name, obj, method)\n            )\n        _wrapper = _multi_decorate(decorator, method)\n        setattr(obj, name, _wrapper)\n        return obj\n\n    # Don't worry about making _dec look similar to a list/tuple as it's rather\n    # meaningless.\n    if not hasattr(decorator, '__iter__'):\n        update_wrapper(_dec, decorator)\n    # Change the name to aid debugging.\n    obj = decorator if hasattr(decorator, '__name__') else decorator.__class__\n    _dec.__name__ = 'method_decorator(%s)' % obj.__name__\n    return _dec\n</code>\n\n\n\nResult of search_method(\"logger\"):\nCould not find method logger in the codebase.\n\nResult of search_class(\"Test\"):\nFound 11 classes with name Test in the codebase.\nThey appeared in the following files:\n<file>tests/decorators/tests.py</file> (7 matches)\n<file>tests/utils_tests/test_encoding.py</file> (2 matches)\n<file>tests/test_runner_apps/sample/pattern_tests.py</file> (1 matches)\n<file>tests/test_runner_apps/sample/tests/tests.py</file> (1 matches)\n\n\n"
+  },
+  {
+   "index": 1,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 3307,
+   "flows": "control",
+   "anchor": false,
+   "text": "Thought: - **do we need more context**:\n    - Given the issue description and the search results, it seems we do need more context regarding the `logger` function or decorator. Since the `logger` method was not found in the codebase, it's challenging to understand exactly how it interacts with `method_decorator` and why it leads to the AttributeError. A more detailed understanding of how `logger` is supposed to work or its implementation details could be crucial. However, without a direct reference to it in the codebase, it's difficult to construct a specific API call without additional information. If `logger` is defined within a specific test file or is part of external libraries or dynamically generated, we might need direct access to those parts of the code or further descriptions.\n    \n- **where are bug locations**:\n    - **Buggy File**: `django/utils/decorators.py`\n    - **Buggy Method**: `method_decorator`\n\nThe analysis points to the `method_decorator` function in `django/utils/decorators.py` as the location where the issue arises. The problem seems to be related to how `method_decorator` handles objects that do not have the typical attributes of a function, such as `__name__` and `__module__`, which are missing in partial objects. The solution would likely involve modifying `method_decorator` to either correctly handle partial objects or ensure that the necessary attributes are preserved or appropriately emulated.\nAction: [{\"func_name\": \"search_method_in_file\", \"arguments\": {\"method_name\": \"method_decorator\", \"file_name\": \"django/utils/decorators.py\"}, \"call_ok\": true}]\nObservation: Here are the code in buggy locations:\nFound 1 methods with name `method_decorator` in file django/utils/decorators.py.\nSearch result 1: <file>django/utils/decorators.py</file> <func>method_decorator</func> <code>def method_decorator(decorator, name=''):\n    \"\"\"\n    Convert a function decorator into a method decorator\n    \"\"\"\n    # 'obj' can be a class or a function. If 'obj' is a function at the time it\n    # is passed to _dec,  it will eventually be a method of the class it is\n    # defined on. If 'obj' is a class, the 'name' is required to be the name\n    # of the method that will be decorated.\n    def _dec(obj):\n        if not isinstance(obj, type):\n            return _multi_decorate(decorator, obj)\n        if not (name and hasattr(obj, name)):\n            raise ValueError(\n                \"The keyword argument `name` must be the name of a method \"\n                \"of the decorated class: %s. Got '%s' instead.\" % (obj, name)\n            )\n        method = getattr(obj, name)\n        if not callable(method):\n            raise TypeError(\n                \"Cannot decorate '%s' as it isn't a callable attribute of \"\n                \"%s (%s).\" % (name, obj, method)\n            )\n        _wrapper = _multi_decorate(decorator, method)\n        setattr(obj, name, _wrapper)\n        return obj\n\n    # Don't worry about making _dec look similar to a list/tuple as it's rather\n    # meaningless.\n    if not hasattr(decorator, '__iter__'):\n        update_wrapper(_dec, decorator)\n    # Change the name to aid debugging.\n    obj = decorator if hasattr(decorator, '__name__') else decorator.__class__\n    _dec.__name__ = 'method_decorator(%s)' % obj.__name__\n    return _dec\n</code>\n\n\n"
+  },
+  {
+   "index": 2,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 72,
+   "flows": "data+control",
+   "anchor": true,
+   "text": "Action: [{\"func_name\": \"write_patch\", \"arguments\": {}, \"call_ok\": true}]"
+  }
+ ],
+ "compression": {
+  "raw_chars": 5807,
+  "compressed_chars": 5807,
+  "outline_chars": 709,
+  "ratio": 1.0,
+  "ratio_with_outline": 1.122094024453246,
+  "spans": 3,
+  "weak_spans": 3,
+  "strong_spans": 0,
+  "steps": 3,
+  "steps_on_flow": 3,
+  "steps_kept": 3,
+  "steps_clipped": 0,
+  "steps_compressed": 0,
+  "steps_restored": 0
+ },
+ "span_prior": {
+  "guesses": [],
+  "chosen": null,
+  "claimed": null,
+  "disagreement": ""
+ },
+ "candidates": null,
+ "experts": null,
+ "op_analysts": null,
+ "compression_plan": null,
+ "span_judge": null,
+ "shortlist": null,
+ "anchor_rule": null,
+ "samples": null,
+ "zoom": null,
+ "bracket": null,
+ "framings": null,
+ "audit": null,
+ "verify": null,
+ "roll": null,
+ "expect": null,
+ "memo": null,
+ "prediction": {
+  "critical_step": 1,
+  "confidence": 0.85,
+  "error_type": "reason.missing_fix",
+  "reason": "In Step 1, the agent correctly identified the buggy location but failed to reason out the actual code fix (e.g., safely extracting the name from a partial object). Because it only provided a vague description of the solution without planning the specific edits, it proceeded to Step 2 and submitted a patch without having made any actual code changes, leading to the test failure.\n[ruled out step 2: Step 2 merely executed the submission of the patch; the root cause was Step 1's failure to formulate and plan the actual code changes, which resulted in the agent submitting an empty or unmodified patch.]",
+  "usage": {
+   "calls": 0,
+   "cached": 27,
+   "prompt_chars": 0,
+   "completion_chars": 0,
+   "failures": 0,
+   "empty": 0,
+   "truncated": 0,
+   "blocked": 0,
+   "seconds": 0.0
+  }
+ }
+}

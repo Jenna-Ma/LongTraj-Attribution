@@ -1,0 +1,280 @@
+{
+ "artifact_version": 2,
+ "task_id": "instance_django__django-15695",
+ "source": "trajaudit",
+ "subset": "auto-code-rover/gpt-4-0125",
+ "n_steps": 3,
+ "raw_chars": 8024,
+ "model": "qwen3.7-plus",
+ "config": {
+  "max_anchors": 3,
+  "flow_window": 20,
+  "flow_index_per_step": 180,
+  "flow_index_chars": 40000,
+  "origin_edges": false,
+  "backward": false,
+  "max_rounds": 20,
+  "batch_size": 4,
+  "max_traced_steps": 60,
+  "topup_rounds": 0,
+  "topup_calls": 12,
+  "target_spans": null,
+  "weak_ratio": 0.0,
+  "workers": 3,
+  "max_prompt_chars": 700000,
+  "verbatim_limit": 2500,
+  "build_outline": true,
+  "span_prior": true,
+  "prior_samples": 1,
+  "prior_signals": false,
+  "prior_symptom": false,
+  "prior_enhanced": false,
+  "prior_coverage_target": 0.3,
+  "localize_symptom": false,
+  "memo_scan": false,
+  "memo_chapters": 10,
+  "prior_unranked": false,
+  "prior_to_localizer": true,
+  "localize_thinking": false,
+  "localize_rootcause": false,
+  "localize_pointwise": false,
+  "localize_multiturn": false,
+  "op_analysts": false,
+  "mixed_paint": false,
+  "rule_anchors": false,
+  "unit_spans": false,
+  "prior_compress": false,
+  "prior_budget_chars": 90000,
+  "possible_keep": false,
+  "full_keep": false,
+  "span_judge": false,
+  "judge_to_localizer": false,
+  "judge_workers": 8,
+  "hybrid_anchors": false,
+  "candidate_set": false,
+  "candidate_strict": false,
+  "plan_candidates": false,
+  "plan_cap": 15,
+  "shortlist": false,
+  "shortlist_k": 5,
+  "protect_candidates": false,
+  "candidates_verbatim": false,
+  "cand_evidence": false,
+  "framings": 1,
+  "verify": false,
+  "verify_graded": false,
+  "verify_chain": false,
+  "verify_reflect": false,
+  "verify_duel": false,
+  "verify_pool": false,
+  "verify_pool_union": false,
+  "verify_outdeg": false,
+  "multi_expert": false,
+  "roll_call": false,
+  "expect_spec": false,
+  "samples": 1,
+  "zoom": false,
+  "zoom_window": 5,
+  "bracket": false,
+  "bracket_window": 5,
+  "bracket_max": 20,
+  "bracket_group": 4,
+  "audit": false,
+  "audit_max": 6,
+  "error_anchors": false,
+  "keep_diagnostics": true,
+  "save_spans": true,
+  "save_steps": true
+ },
+ "stage": "complete",
+ "created": "2026-08-30T14:34:03",
+ "updated": "2026-10-19T16:55:49",
+ "flow": {
+  "anchors": [
+   2
+  ],
+  "anchors_located": [
+   2
+  ],
+  "failure_summary": "The agent finalised its fix by writing a patch to RenameIndex, but the re-applied database_forwards still crashes because the old auto-generated index name is not restored on backward migration. The failing test test_rename_index shows database_forwards recreating 'new_pony_test_idx' when it already exists, producing a relation-already-exists error.",
+  "failure_entities": [
+   "RenameIndex",
+   "database_forwards",
+   "django/db/migrations/operations/models.py",
+   "test_rename_index",
+   "new_pony_test_idx",
+   "pony_pink_idx",
+   "migrations.test_operations.OperationTests"
+  ],
+  "edges": [
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "data",
+    "entity": "RenameIndex class with database_forwards/database_backwards methods in django/db/migrations/operations/models.py",
+    "rationale": "step 1 identifies bug locations from the class/method search results"
+   },
+   {
+    "src": 1,
+    "dst": 2,
+    "kind": "data",
+    "entity": "database_forwards and database_backwards code of RenameIndex",
+    "rationale": "the patch is written against the code retrieved here"
+   },
+   {
+    "src": 1,
+    "dst": 2,
+    "kind": "control",
+    "entity": "Buggy Files and Methods list",
+    "rationale": "step 2 carries out the plan to patch the identified buggy methods"
+   }
+  ]
+ },
+ "flow_stats": {
+  "n_edges": 3,
+  "n_data_edges": 2,
+  "n_control_edges": 1,
+  "n_anchors": 1,
+  "steps_on_flow": 3,
+  "steps_on_data_flow": 3,
+  "steps_on_control_flow": 2,
+  "coverage": 1.0,
+  "earliest_on_flow": 0
+ },
+ "spans": [
+  {
+   "start": 0,
+   "end": 0,
+   "label": "Locating RenameIndex and test helpers",
+   "tier": "weak",
+   "summary": "The agent explored the codebase to locate the RenameIndex migration operation and the assertIndexNameExists test helper. It successfully found the RenameIndex class and its database_forwards and database_backwards methods in django/db/migrations/operations/models.py, along with the assertIndexNameExists method in tests/migrations/test_base.py."
+  },
+  {
+   "start": 1,
+   "end": 1,
+   "label": "Analyzing bug location",
+   "tier": "weak",
+   "summary": "The agent aimed to locate and inspect the buggy methods database_forwards and database_backwards within the RenameIndex class to understand the failure context. It successfully retrieved the source code for both methods from django/db/migrations/operations/models.py."
+  },
+  {
+   "start": 2,
+   "end": 2,
+   "label": "Applying fix",
+   "tier": "weak",
+   "summary": "The agent pursued the sub-goal of applying a fix by calling the write_patch function. The segment ended with the function being invoked, although it was called with an empty arguments object."
+  }
+ ],
+ "outline": {
+  "overview": "The agent set out to resolve a crash in the RenameIndex() migration operation when an unnamed index moves backward and forward. To orient itself, it explored the codebase during steps 0-0 to locate the RenameIndex class and the assertIndexNameExists test helper. It successfully found the RenameIndex class, including its database_forwards and database_backwards methods, within django/db/migrations/operations/models.py, and the test helper in tests/migrations/test_base.py. In steps 1-1, the agent analyzed the bug location by retrieving and inspecting the source code for those specific methods in django/db/migrations/operations/models.py. Moving to steps 2-2, the agent attempted to apply a fix by invoking the write_patch function. It encountered an obstacle when the function was called with an empty arguments object. The run ended immediately after this invocation, concluding the agent's execution sequence.",
+  "spans": [
+   {
+    "start": 0,
+    "end": 0,
+    "label": "Locating RenameIndex and test helpers",
+    "tier": "weak",
+    "summary": "The agent explored the codebase to locate the RenameIndex migration operation and the assertIndexNameExists test helper. It successfully found the RenameIndex class and its database_forwards and database_backwards methods in django/db/migrations/operations/models.py, along with the assertIndexNameExists method in tests/migrations/test_base.py."
+   },
+   {
+    "start": 1,
+    "end": 1,
+    "label": "Analyzing bug location",
+    "tier": "weak",
+    "summary": "The agent aimed to locate and inspect the buggy methods database_forwards and database_backwards within the RenameIndex class to understand the failure context. It successfully retrieved the source code for both methods from django/db/migrations/operations/models.py."
+   },
+   {
+    "start": 2,
+    "end": 2,
+    "label": "Applying fix",
+    "tier": "weak",
+    "summary": "The agent pursued the sub-goal of applying a fix by calling the write_patch function. The segment ended with the function being invoked, although it was called with an empty arguments object."
+   }
+  ]
+ },
+ "steps": [
+  {
+   "index": 0,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 4598,
+   "flows": "data",
+   "anchor": false,
+   "text": "Action: [{\"func_name\": \"search_class\", \"arguments\": {\"class_name\": \"RenameIndex\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"database_forwards\", \"class_name\": \"RenameIndex\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"database_backwards\", \"class_name\": \"RenameIndex\"}, \"call_ok\": true}, {\"func_name\": \"search_method\", \"arguments\": {\"method_name\": \"assertIndexNameExists\"}, \"call_ok\": true}]\nObservation: Result of search_class(\"RenameIndex\"):\nFound 1 classes with name RenameIndex in the codebase.\nSearch result 1: <file>django/db/migrations/operations/models.py</file> <class>RenameIndex</class> <code>class RenameIndex(IndexOperation):\n    def __init__(self, model_name, new_name, old_name=None, old_fields=None):\n    @cached_property\n    def old_name_lower(self):\n    @cached_property\n    def new_name_lower(self):\n    def deconstruct(self):\n    def state_forwards(self, app_label, state):\n    def database_forwards(self, app_label, schema_editor, from_state, to_state):\n    def database_backwards(self, app_label, schema_editor, from_state, to_state):\n    def describe(self):\n    @property\n    def migration_name_fragment(self):\n    def reduce(self, operation, app_label):\n</code>\n\n\n\nResult of search_method_in_class(\"database_forwards\", \"RenameIndex\"):\nFound 1 methods with name database_forwards in class RenameIndex.\nSearch result 1: <file>django/db/migrations/operations/models.py</file> <class>RenameIndex</class> <func>database_forwards</func> <code>    def database_forwards(self, app_label, schema_editor, from_state, to_state):\n        model = to_state.apps.get_model(app_label, self.model_name)\n        if not self.allow_migrate_model(schema_editor.connection.alias, model):\n            return\n\n        if self.old_fields:\n            from_model = from_state.apps.get_model(app_label, self.model_name)\n            columns = [\n                from_model._meta.get_field(field).column for field in self.old_fields\n            ]\n            matching_index_name = schema_editor._constraint_names(\n                from_model, column_names=columns, index=True\n            )\n            if len(matching_index_name) != 1:\n                raise ValueError(\n                    \"Found wrong number (%s) of indexes for %s(%s).\"\n                    % (\n                        len(matching_index_name),\n                        from_model._meta.db_table,\n                        \", \".join(columns),\n                    )\n                )\n            old_index = models.Index(\n                fields=self.old_fields,\n                name=matching_index_name[0],\n            )\n        else:\n            from_model_state = from_state.models[app_label, self.model_name_lower]\n            old_index = from_model_state.get_index_by_name(self.old_name)\n\n        to_model_state = to_state.models[app_label, self.model_name_lower]\n        new_index = to_model_state.get_index_by_name(self.new_name)\n        schema_editor.rename_index(model, old_index, new_index)\n</code>\n\nOther results are in these files:\n\n\nResult of search_method_in_class(\"database_backwards\", \"RenameIndex\"):\nFound 1 methods with name database_backwards in class RenameIndex.\nSearch result 1: <file>django/db/migrations/operations/models.py</file> <class>RenameIndex</class> <func>database_backwards</func> <code>    def database_backwards(self, app_label, schema_editor, from_state, to_state):\n        if self.old_fields:\n            # Backward operation with unnamed index is a no-op.\n            return\n\n        self.new_name_lower, self.old_name_lower = (\n            self.old_name_lower,\n            self.new_name_lower,\n        )\n        self.new_name, self.old_name = self.old_name, self.new_name\n\n        self.database_forwards(app_label, schema_editor, from_state, to_state)\n\n        self.new_name_lower, self.old_name_lower = (\n            self.old_name_lower,\n            self.new_name_lower,\n        )\n        self.new_name, self.old_name = self.old_name, self.new_name\n</code>\n\nOther results are in these files:\n\n\nResult of search_method(\"assertIndexNameExists\"):\nFound 1 methods with name assertIndexNameExists in the codebase.\nSearch result 1: <file>tests/migrations/test_base.py</file> <class>MigrationTestBase</class> <func>assertIndexNameExists</func> <code>    def assertIndexNameExists(self, table, index, using=\"default\"):\n        with connections[using].cursor() as cursor:\n            self.assertIn(\n                index,\n                connection.introspection.get_constraints(cursor, table),\n            )\n</code>\n\n\n\n"
+  },
+  {
+   "index": 1,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 3354,
+   "flows": "data+control",
+   "anchor": false,
+   "text": "Thought: - **do we need more context**: \n\n- **where are bug locations**: \n  - **Buggy Files and Methods**:\n    1. **File**: `django/db/migrations/operations/models.py`\n       - **Method**: `database_forwards` in class `RenameIndex`\n    2. **File**: `django/db/migrations/operations/models.py`\n       - **Method**: `database_backwards` in class `RenameIndex`\nAction: [{\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"database_forwards\", \"class_name\": \"RenameIndex\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"database_backwards\", \"class_name\": \"RenameIndex\"}, \"call_ok\": true}]\nObservation: Here are the code in buggy locations:\nFound 1 methods with name database_forwards in class RenameIndex.\nSearch result 1: <file>django/db/migrations/operations/models.py</file> <class>RenameIndex</class> <func>database_forwards</func> <code>    def database_forwards(self, app_label, schema_editor, from_state, to_state):\n        model = to_state.apps.get_model(app_label, self.model_name)\n        if not self.allow_migrate_model(schema_editor.connection.alias, model):\n            return\n\n        if self.old_fields:\n            from_model = from_state.apps.get_model(app_label, self.model_name)\n            columns = [\n                from_model._meta.get_field(field).column for field in self.old_fields\n            ]\n            matching_index_name = schema_editor._constraint_names(\n                from_model, column_names=columns, index=True\n            )\n            if len(matching_index_name) != 1:\n                raise ValueError(\n                    \"Found wrong number (%s) of indexes for %s(%s).\"\n                    % (\n                        len(matching_index_name),\n                        from_model._meta.db_table,\n                        \", \".join(columns),\n                    )\n                )\n            old_index = models.Index(\n                fields=self.old_fields,\n                name=matching_index_name[0],\n            )\n        else:\n            from_model_state = from_state.models[app_label, self.model_name_lower]\n            old_index = from_model_state.get_index_by_name(self.old_name)\n\n        to_model_state = to_state.models[app_label, self.model_name_lower]\n        new_index = to_model_state.get_index_by_name(self.new_name)\n        schema_editor.rename_index(model, old_index, new_index)\n</code>\n\nOther results are in these files:\n\nFound 1 methods with name database_backwards in class RenameIndex.\nSearch result 1: <file>django/db/migrations/operations/models.py</file> <class>RenameIndex</class> <func>database_backwards</func> <code>    def database_backwards(self, app_label, schema_editor, from_state, to_state):\n        if self.old_fields:\n            # Backward operation with unnamed index is a no-op.\n            return\n\n        self.new_name_lower, self.old_name_lower = (\n            self.old_name_lower,\n            self.new_name_lower,\n        )\n        self.new_name, self.old_name = self.old_name, self.new_name\n\n        self.database_forwards(app_label, schema_editor, from_state, to_state)\n\n        self.new_name_lower, self.old_name_lower = (\n            self.old_name_lower,\n            self.new_name_lower,\n        )\n        self.new_name, self.old_name = self.old_name, self.new_name\n</code>\n\nOther results are in these files:\n\n"
+  },
+  {
+   "index": 2,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 72,
+   "flows": "data+control",
+   "anchor": true,
+   "text": "Action: [{\"func_name\": \"write_patch\", \"arguments\": {}, \"call_ok\": true}]"
+  }
+ ],
+ "compression": {
+  "raw_chars": 8024,
+  "compressed_chars": 8024,
+  "outline_chars": 803,
+  "ratio": 1.0,
+  "ratio_with_outline": 1.100074775672981,
+  "spans": 3,
+  "weak_spans": 3,
+  "strong_spans": 0,
+  "steps": 3,
+  "steps_on_flow": 3,
+  "steps_kept": 3,
+  "steps_clipped": 0,
+  "steps_compressed": 0,
+  "steps_restored": 0
+ },
+ "span_prior": {
+  "guesses": [],
+  "chosen": null,
+  "claimed": null,
+  "disagreement": ""
+ },
+ "candidates": null,
+ "experts": null,
+ "op_analysts": null,
+ "compression_plan": null,
+ "span_judge": null,
+ "shortlist": null,
+ "anchor_rule": null,
+ "samples": null,
+ "zoom": null,
+ "bracket": null,
+ "framings": null,
+ "audit": null,
+ "verify": null,
+ "roll": null,
+ "expect": null,
+ "memo": null,
+ "prediction": {
+  "critical_step": 1,
+  "confidence": 0.95,
+  "error_type": "reason.analysis",
+  "reason": "In Step 1, the agent was supposed to analyze the bug and devise a fix, but it merely re-fetched the code it already had in Step 0 and provided no actual reasoning or plan. Because it never understood why the backward migration failed to restore the auto-generated name for an unnamed index, it could not produce a correct patch, directly causing the crash observed in Step 2.\n[ruled out step 2: Step 2 is the symptom step where the incorrect patch was applied. The patch was incorrect because the agent failed to analyze the bug and formulate a correct fix in Step 1, merely propagating its lack of understanding into the final output.]",
+  "usage": {
+   "calls": 0,
+   "cached": 33,
+   "prompt_chars": 0,
+   "completion_chars": 0,
+   "failures": 0,
+   "empty": 0,
+   "truncated": 0,
+   "blocked": 0,
+   "seconds": 0.0
+  }
+ }
+}

@@ -1,0 +1,273 @@
+{
+ "artifact_version": 2,
+ "task_id": "instance_django__django-15252",
+ "source": "trajaudit",
+ "subset": "auto-code-rover/gpt-4-0125",
+ "n_steps": 3,
+ "raw_chars": 4941,
+ "model": "qwen3.7-plus",
+ "config": {
+  "max_anchors": 3,
+  "flow_window": 20,
+  "flow_index_per_step": 180,
+  "flow_index_chars": 40000,
+  "origin_edges": false,
+  "backward": false,
+  "max_rounds": 20,
+  "batch_size": 4,
+  "max_traced_steps": 60,
+  "topup_rounds": 0,
+  "topup_calls": 12,
+  "target_spans": null,
+  "weak_ratio": 0.0,
+  "workers": 3,
+  "max_prompt_chars": 700000,
+  "verbatim_limit": 2500,
+  "build_outline": true,
+  "span_prior": true,
+  "prior_samples": 1,
+  "prior_signals": false,
+  "prior_symptom": false,
+  "prior_enhanced": false,
+  "prior_coverage_target": 0.3,
+  "localize_symptom": false,
+  "memo_scan": false,
+  "memo_chapters": 10,
+  "prior_unranked": false,
+  "prior_to_localizer": true,
+  "localize_thinking": false,
+  "localize_rootcause": false,
+  "localize_pointwise": false,
+  "localize_multiturn": false,
+  "op_analysts": false,
+  "mixed_paint": false,
+  "rule_anchors": false,
+  "unit_spans": false,
+  "prior_compress": false,
+  "prior_budget_chars": 90000,
+  "possible_keep": false,
+  "full_keep": false,
+  "span_judge": false,
+  "judge_to_localizer": false,
+  "judge_workers": 8,
+  "hybrid_anchors": false,
+  "candidate_set": false,
+  "candidate_strict": false,
+  "plan_candidates": false,
+  "plan_cap": 15,
+  "shortlist": false,
+  "shortlist_k": 5,
+  "protect_candidates": false,
+  "candidates_verbatim": false,
+  "cand_evidence": false,
+  "framings": 1,
+  "verify": false,
+  "verify_graded": false,
+  "verify_chain": false,
+  "verify_reflect": false,
+  "verify_duel": false,
+  "verify_pool": false,
+  "verify_pool_union": false,
+  "verify_outdeg": false,
+  "multi_expert": false,
+  "roll_call": false,
+  "expect_spec": false,
+  "samples": 1,
+  "zoom": false,
+  "zoom_window": 5,
+  "bracket": false,
+  "bracket_window": 5,
+  "bracket_max": 20,
+  "bracket_group": 4,
+  "audit": false,
+  "audit_max": 6,
+  "error_anchors": false,
+  "keep_diagnostics": true,
+  "save_spans": true,
+  "save_steps": true
+ },
+ "stage": "complete",
+ "created": "2026-08-30T14:33:41",
+ "updated": "2026-10-19T16:55:49",
+ "flow": {
+  "anchors": [
+   2
+  ],
+  "anchors_located": [
+   2
+  ],
+  "failure_summary": "The agent wrote a patch targeting ensure_schema and record_applied in django/db/migrations/recorder.py, but the fix did not prevent ensure_schema from being called when TEST.MIGRATE is False. The failing test test_migrate_test_setting_false_ensure_schema asserts ensure_schema was not called, yet it was called 1 time.",
+  "failure_entities": [
+   "django/db/migrations/recorder.py",
+   "ensure_schema",
+   "record_applied",
+   "MigrationRecorder",
+   "test_migrate_test_setting_false_ensure_schema",
+   "mocked_ensure_schema.assert_not_called()",
+   "create_test_db"
+  ],
+  "edges": [
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "data",
+    "entity": "MigrationRecorder methods ensure_schema and record_applied",
+    "rationale": "step 1 identifies buggy methods from class listing found in step 0"
+   },
+   {
+    "src": 0,
+    "dst": 1,
+    "kind": "control",
+    "entity": "search results for MigrationRecorder and allow_migrate",
+    "rationale": "step 1 narrows to bug locations based on step 0's searches"
+   },
+   {
+    "src": 1,
+    "dst": 2,
+    "kind": "data",
+    "entity": "code of ensure_schema and record_applied",
+    "rationale": "patch is written against the code retrieved in step 1"
+   },
+   {
+    "src": 1,
+    "dst": 2,
+    "kind": "control",
+    "entity": "identified buggy locations in recorder.py",
+    "rationale": "write_patch acts on the bug locations decided in step 1"
+   }
+  ]
+ },
+ "flow_stats": {
+  "n_edges": 4,
+  "n_data_edges": 2,
+  "n_control_edges": 2,
+  "n_anchors": 1,
+  "steps_on_flow": 3,
+  "steps_on_data_flow": 3,
+  "steps_on_control_flow": 3,
+  "coverage": 1.0,
+  "earliest_on_flow": 0
+ },
+ "spans": [
+  {
+   "start": 0,
+   "end": 1,
+   "label": "Exploring and analyzing code",
+   "tier": "weak",
+   "summary": "The agent searched for the `MigrationRecorder` class and its methods `ensure_schema` and `record_applied`, as well as the `allow_migrate` method across the codebase. It then identified `ensure_schema` and `record_applied` in `django/db/migrations/recorder.py` as the buggy locations and retrieved their source code."
+  },
+  {
+   "start": 2,
+   "end": 2,
+   "label": "Writing the patch",
+   "tier": "weak",
+   "summary": "The agent invoked the write_patch function to generate and submit the final code modifications for the task."
+  }
+ ],
+ "outline": {
+  "overview": "The agent set out to fix an issue where the `MigrationRecorder` class failed to respect the `allow_migrate` rules defined by a database router. During steps 0-1, it oriented itself by searching the codebase for the `MigrationRecorder` class, specifically targeting its `ensure_schema` and `record_applied` methods, as well as the `allow_migrate` method. It then pinpointed `ensure_schema` and `record_applied` within the `django/db/migrations/recorder.py` file as the specific locations requiring modification and retrieved their source code. The agent did not encounter any obstacles or need to change direction, proceeding directly from code analysis to implementation. Finally, in step 2, the agent invoked the `write_patch` function to generate and submit the final code modifications to conclude the task.",
+  "spans": [
+   {
+    "start": 0,
+    "end": 1,
+    "label": "Exploring and analyzing code",
+    "tier": "weak",
+    "summary": "The agent searched for the `MigrationRecorder` class and its methods `ensure_schema` and `record_applied`, as well as the `allow_migrate` method across the codebase. It then identified `ensure_schema` and `record_applied` in `django/db/migrations/recorder.py` as the buggy locations and retrieved their source code."
+   },
+   {
+    "start": 2,
+    "end": 2,
+    "label": "Writing the patch",
+    "tier": "weak",
+    "summary": "The agent invoked the write_patch function to generate and submit the final code modifications for the task."
+   }
+  ]
+ },
+ "steps": [
+  {
+   "index": 0,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 3121,
+   "flows": "data+control",
+   "anchor": false,
+   "text": "Action: [{\"func_name\": \"search_class\", \"arguments\": {\"class_name\": \"MigrationRecorder\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"record_applied\", \"class_name\": \"MigrationRecorder\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_class\", \"arguments\": {\"method_name\": \"ensure_schema\", \"class_name\": \"MigrationRecorder\"}, \"call_ok\": true}, {\"func_name\": \"search_method\", \"arguments\": {\"method_name\": \"allow_migrate\"}, \"call_ok\": true}]\nObservation: Result of search_class(\"MigrationRecorder\"):\nFound 1 classes with name MigrationRecorder in the codebase.\nSearch result 1: <file>django/db/migrations/recorder.py</file> <class>MigrationRecorder</class> <code>class MigrationRecorder:\n    _migration_class = None\n    @classproperty\n    def Migration(cls):\n    def __init__(self, connection):\n    @property\n    def migration_qs(self):\n    def has_table(self):\n    def ensure_schema(self):\n    def applied_migrations(self):\n    def record_applied(self, app, name):\n    def record_unapplied(self, app, name):\n    def flush(self):\n</code>\n\n\n\nResult of search_method_in_class(\"record_applied\", \"MigrationRecorder\"):\nFound 1 methods with name record_applied in class MigrationRecorder.\nSearch result 1: <file>django/db/migrations/recorder.py</file> <class>MigrationRecorder</class> <func>record_applied</func> <code>    def record_applied(self, app, name):\n        \"\"\"Record that a migration was applied.\"\"\"\n        self.ensure_schema()\n        self.migration_qs.create(app=app, name=name)\n</code>\n\nOther results are in these files:\n\n\nResult of search_method_in_class(\"ensure_schema\", \"MigrationRecorder\"):\nFound 1 methods with name ensure_schema in class MigrationRecorder.\nSearch result 1: <file>django/db/migrations/recorder.py</file> <class>MigrationRecorder</class> <func>ensure_schema</func> <code>    def ensure_schema(self):\n        \"\"\"Ensure the table exists and has the correct schema.\"\"\"\n        # If the table's there, that's fine - we've never changed its schema\n        # in the codebase.\n        if self.has_table():\n            return\n        # Make the table\n        try:\n            with self.connection.schema_editor() as editor:\n                editor.create_model(self.Migration)\n        except DatabaseError as exc:\n            raise MigrationSchemaMissing(\"Unable to create the django_migrations table (%s)\" % exc)\n</code>\n\nOther results are in these files:\n\n\nResult of search_method(\"allow_migrate\"):\nFound 16 methods with name allow_migrate in the codebase.\nThey appeared in the following files:\n<file>django/db/utils.py</file> (1 matches)\n<file>tests/check_framework/test_multi_db.py</file> (1 matches)\n<file>tests/migrations/routers.py</file> (2 matches)\n<file>tests/multiple_database/routers.py</file> (2 matches)\n<file>tests/migrations/test_multidb.py</file> (4 matches)\n<file>tests/postgres_tests/test_operations.py</file> (1 matches)\n<file>tests/cache/tests.py</file> (1 matches)\n<file>tests/gis_tests/layermap/tests.py</file> (1 matches)\n<file>tests/sites_tests/tests.py</file> (1 matches)\n<file>tests/multiple_database/tests.py</file> (2 matches)\n\n\n"
+  },
+  {
+   "index": 1,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 1748,
+   "flows": "data+control",
+   "anchor": false,
+   "text": "Thought: - do we need more context:\n\n- where are bug locations: \n  - **Buggy Files and Methods**:\n    1. **File**: `django/db/migrations/recorder.py`\n       - **Method**: `ensure_schema`\n       - **Method**: `record_applied`\nAction: [{\"func_name\": \"search_method_in_file\", \"arguments\": {\"method_name\": \"ensure_schema\", \"file_name\": \"django/db/migrations/recorder.py\"}, \"call_ok\": true}, {\"func_name\": \"search_method_in_file\", \"arguments\": {\"method_name\": \"record_applied\", \"file_name\": \"django/db/migrations/recorder.py\"}, \"call_ok\": true}]\nObservation: Here are the code in buggy locations:\nFound 1 methods with name `ensure_schema` in file django/db/migrations/recorder.py.\nSearch result 1: <file>django/db/migrations/recorder.py</file> <class>MigrationRecorder</class> <func>ensure_schema</func> <code>    def ensure_schema(self):\n        \"\"\"Ensure the table exists and has the correct schema.\"\"\"\n        # If the table's there, that's fine - we've never changed its schema\n        # in the codebase.\n        if self.has_table():\n            return\n        # Make the table\n        try:\n            with self.connection.schema_editor() as editor:\n                editor.create_model(self.Migration)\n        except DatabaseError as exc:\n            raise MigrationSchemaMissing(\"Unable to create the django_migrations table (%s)\" % exc)\n</code>\n\n\nFound 1 methods with name `record_applied` in file django/db/migrations/recorder.py.\nSearch result 1: <file>django/db/migrations/recorder.py</file> <class>MigrationRecorder</class> <func>record_applied</func> <code>    def record_applied(self, app, name):\n        \"\"\"Record that a migration was applied.\"\"\"\n        self.ensure_schema()\n        self.migration_qs.create(app=app, name=name)\n</code>\n\n\n"
+  },
+  {
+   "index": 2,
+   "role": "assistant",
+   "name": "",
+   "tier": "keep",
+   "raw_chars": 72,
+   "flows": "data+control",
+   "anchor": true,
+   "text": "Action: [{\"func_name\": \"write_patch\", \"arguments\": {}, \"call_ok\": true}]"
+  }
+ ],
+ "compression": {
+  "raw_chars": 4941,
+  "compressed_chars": 4941,
+  "outline_chars": 423,
+  "ratio": 1.0,
+  "ratio_with_outline": 1.0856102003642987,
+  "spans": 2,
+  "weak_spans": 2,
+  "strong_spans": 0,
+  "steps": 3,
+  "steps_on_flow": 3,
+  "steps_kept": 3,
+  "steps_clipped": 0,
+  "steps_compressed": 0,
+  "steps_restored": 0
+ },
+ "span_prior": {
+  "guesses": [],
+  "chosen": null,
+  "claimed": null,
+  "disagreement": ""
+ },
+ "candidates": null,
+ "experts": null,
+ "op_analysts": null,
+ "compression_plan": null,
+ "span_judge": null,
+ "shortlist": null,
+ "anchor_rule": null,
+ "samples": null,
+ "zoom": null,
+ "bracket": null,
+ "framings": null,
+ "audit": null,
+ "verify": null,
+ "roll": null,
+ "expect": null,
+ "memo": null,
+ "prediction": {
+  "critical_step": 1,
+  "confidence": 0.95,
+  "error_type": "reason.plan",
+  "reason": "In Step 1, the agent incorrectly decided to patch `ensure_schema` and `record_applied` directly in `recorder.py`. Although the issue describes the problem manifesting inside these methods, the failing test asserts that `ensure_schema` must not be *called* at all under certain conditions. By targeting the methods themselves instead of preventing the call at the caller level (e.g., in the migration executor), the agent's patch could not satisfy the test's assertion, leading to the failure.\n[ruled out step 2: Step 2 merely executed the flawed plan established in Step 1, applying the patch to the incorrectly chosen methods without questioning the approach.]",
+  "usage": {
+   "calls": 0,
+   "cached": 30,
+   "prompt_chars": 0,
+   "completion_chars": 0,
+   "failures": 0,
+   "empty": 0,
+   "truncated": 0,
+   "blocked": 0,
+   "seconds": 0.0
+  }
+ }
+}
