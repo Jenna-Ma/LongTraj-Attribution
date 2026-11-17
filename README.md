@@ -2,18 +2,20 @@
 
 面向长程智能体失败轨迹的关键步骤定位方法。输入一条最终失败的轨迹，输出最早导致最终失败的 critical step。
 
-本目录归档的是共享主 pipeline：
+本目录归档共享主 pipeline，并在统一入口中集成 LongRCA SWE-bench Pro
+的 episode 专用定位器。入口会根据轨迹结构自动路由：
 
 ```text
 失败轨迹
-  -> 构建数据流 / 控制流图
-  -> 划分语义区域并生成区域先验
-  -> 按因果相关性压缩轨迹、剪枝候选
-  -> 多维候选核验与最终定位
+  -> 是否包含精确名称 DiagnostAgent (-> ActionAgent)？
+       ├─ 是：LongRCA episode 选择 + 代码门控 + 结构规则融合
+       └─ 否：数据/控制流图 + 区域先验 + 压缩剪枝 + 多维定位
   -> critical step
 ```
 
-LongRCA episode、WebArena、VitaBench 和 ALFWorld 的语料专用 `probe` 方法不在本快照中。快照来源和边界见 [SNAPSHOT.md](SNAPSHOT.md)。
+LongRCA 路由对应历史记录 **63/128 = 49.22%** 的方法。WebArena、VitaBench
+和 ALFWorld 的语料专用 `probe` 方法仍不在本快照中。快照来源和边界见
+[SNAPSHOT.md](SNAPSHOT.md)。
 
 ## 1. 安装
 
@@ -97,6 +99,14 @@ result = engine.locate({
 print(result["critical_step_id"], result["reason"])
 ```
 
+调用方不需要指定数据集或方法。`engine.locate()` 会先检查 step 的 `name`：
+
+- 存在精确的 `DiagnostAgent (-> ActionAgent)`：走 `longrca_episode`；
+- 不存在：走 `longtraj_main`。
+
+不能用近似名称触发，例如 `DiagnostAgent -> ActionAgent` 不会被识别为 LongRCA
+handoff。返回的 `pipeline_route` 和 `method` 会记录实际采用的路径。
+
 可用接口：
 
 - `engine.locate(request)`：定位一条 JSON-compatible 轨迹。
@@ -133,7 +143,8 @@ result = engine.locate(request, include_diagnostics=True)
 约定：
 
 - `task_id` 必填；同一批次内必须唯一。
-- `steps` 必须非空，也可使用别名 `messages`。
+- `steps` 必须非空，也可使用别名 `messages` 或 LongRCA 原始格式的 `history`。
+- `task_id` 也可使用 LongRCA 原始格式的别名 `question_ID`。
 - `step` 可为字符串或数字，必须在一条轨迹内唯一；若省略，则使用数组位置。
 - `agent`、`model`、`ai` 会归一化为 `assistant`；`function`、`observation` 会归一化为 `tool`。
 - 名称为 `Computer_terminal` 的消息按工具输出处理。
@@ -159,6 +170,8 @@ result = engine.locate(request, include_diagnostics=True)
     "content": "..."
   },
   "profile": "sp_qwen_clean",
+  "pipeline_route": "longtraj_main",
+  "method": "longtraj_main_pipeline",
   "model": "qwen3.7-plus",
   "usage": {},
   "compression_ratio": 0.31
@@ -166,6 +179,11 @@ result = engine.locate(request, include_diagnostics=True)
 ```
 
 `critical_step` 是 pipeline 使用的、从 0 开始的内部数组位置；`critical_step_id` 是调用方输入的原始 step ID。跨系统关联结果时应优先使用 `critical_step_id`。
+
+LongRCA 路由返回 `pipeline_route: "longrca_episode"`、
+`method/profile: "longrca_sp_episode_guarded_v1"`；主 pipeline 返回
+`pipeline_route: "longtraj_main"`。构造 engine 时传入的 `profile` 只决定主 pipeline
+的配置；一旦检测到精确 handoff，LongRCA 路由优先。
 
 ### 3.4 JSON CLI
 
@@ -186,6 +204,15 @@ longtraj-attribution -i trajectory.json -o result.json --profile generic --confi
 ```
 
 CLI 接受以下顶层格式：一条轨迹对象、轨迹数组、`{"trajectory": {...}}` 或 `{"trajectories": [...]}`。输入/输出路径使用 `-` 时分别读取 stdin 或写入 stdout。
+
+自动 LongRCA 路由示例：
+
+```powershell
+python -m longtraj.integration `
+  --input examples/longrca_trajectory.example.json `
+  --output longrca_result.json `
+  --config config.json
+```
 
 只检查接缝而不调用 API：
 
@@ -210,6 +237,14 @@ python -m longtraj.integration `
 
 这些 profile 只是固化已记录的配置，不代表跨语料都最优。新项目建议先用 `generic` 小规模验证，再根据轨迹结构选择对应 profile。必要时可通过构造函数的 `config_overrides` 覆盖 `Config` 字段，并保留完整实验记录。
 
+LongRCA 专用方法不作为 profile 暴露，因为它由 handoff 结构自动触发。它执行：
+
+1. 提取所有 `DiagnostAgent (-> ActionAgent)` handoff；
+2. 用任务、handoff、episode 尾部诊断和最终测试/评审证据让 Qwen 选择失败 episode；
+3. 代码核验后续 handoff 的长度不得短于第一 handoff；
+4. 模型保留第一 episode 时，允许“长度至少 3 倍且任务词覆盖率提高至少 0.10”的确定性规则补位；
+5. 输出所选 episode 的 handoff step。
+
 ## 5. 主方法与代码对应关系
 
 - `longtraj/tracing.py`：构建数据流/控制流图。
@@ -219,6 +254,7 @@ python -m longtraj.integration `
 - `longtraj/localize.py`：主定位器、多维候选核验与融合。
 - `longtraj/pipeline.py`：编排完整 pipeline。
 - `longtraj/integration.py`：本项目对外的稳定 SDK/JSON CLI 边界。
+- `longtraj/longrca_specialized.py`：LongRCA 49.22% episode 专用链路。
 - `longtraj/artifacts.py`：中间产物和 flow 的持久化。
 
 更多方法细节见 [METHOD.md](METHOD.md)、[METHOD_sp_noout.md](METHOD_sp_noout.md) 和 [BEST_ARM_Q7.md](BEST_ARM_Q7.md)。

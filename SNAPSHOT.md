@@ -13,8 +13,9 @@ The source repository was not clean at snapshot time. Therefore the commit ID
 alone does not reconstruct this snapshot; the files in this directory are the
 authoritative archived version.
 
-The snapshot intentionally excludes exploratory dataset-specific pipelines
-under `probe/` (LongRCA episode locator, WebArena structural rules, ALFWorld
-few-shot composition, and similar experiments). It archives the shared main
-pipeline requested here.
+The snapshot archives the shared main pipeline and the recorded LongRCA
+SWE-bench Pro 63/128 episode locator, routed automatically at the integration
+boundary. Other exploratory dataset-specific pipelines under `probe/`
+(WebArena structural rules, ALFWorld few-shot composition, and similar
+experiments) remain excluded.
 
